@@ -12,6 +12,12 @@ const App = () => {
   const handleClickAddPerson = (event) => {
     event.preventDefault();
 
+    if (persons.findIndex((person) => person.name === newName) !== -1) {
+      alert(`${newName} is already added to the phonebook`);
+      setNewName("");
+      return;
+    }
+
     const newPerson = { name: newName };
     setPersons(persons.concat(newPerson));
     setNewName("");
