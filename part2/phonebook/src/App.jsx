@@ -46,6 +46,18 @@ const App = () => {
     });
   };
 
+  const handleDeletePerson = (person) => {
+    if (!window.confirm(`Delete ${person.name}?`)) {
+      return;
+    }
+
+    console.log(`Deleting person: ${person.name}...`);
+    personService.removePerson(person.id).then((response) => {
+      console.log("Deletion response:", response);
+      setPersons(persons.filter((p) => p.id !== person.id));
+    });
+  };
+
   const personsShown =
     nameFilter === ""
       ? persons
@@ -66,7 +78,7 @@ const App = () => {
         handleClickAddPerson={handleClickAddPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsShown} />
+      <Persons persons={personsShown} handleDeletePerson={handleDeletePerson} />
     </div>
   );
 };
