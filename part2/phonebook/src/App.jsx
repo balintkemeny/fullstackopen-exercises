@@ -31,42 +31,43 @@ const App = () => {
 
   const handleClickAddPerson = (event) => {
     event.preventDefault();
-
     const existingPerson = persons.find((person) => person.name === newName);
 
-    if (existingPerson !== undefined) {
-      if (
-        !window.confirm(
-          `${newName} is already added to the phonebook. Replace the old number with the new one?`,
-        )
-      ) {
-        setNewName("");
-        setNewNumber("");
-        console.log("I'm not sure if this gets executed");
-        return;
-      }
+    existingPerson === undefined
+      ? createPerson()
+      : updatePerson(existingPerson);
+  };
 
-      personService
-        .update(existingPerson.id, { ...existingPerson, number: newNumber })
-        .then((returnedPerson) => {
-          setPersons(
-            persons.map((p) =>
-              p.id === returnedPerson.id ? returnedPerson : p,
-            ),
-          );
-          setNewName("");
-          setNewNumber("");
-        });
-
-      return;
-    }
-
+  const createPerson = () => {
     const newPerson = { name: newName, number: newNumber };
     personService.create(newPerson).then((returnedPerson) => {
       setPersons(persons.concat(returnedPerson));
       setNewName("");
       setNewNumber("");
     });
+  };
+
+  const updatePerson = (person) => {
+    if (
+      !window.confirm(
+        `${person.name} is already added to the phonebook. Replace the old number with the new one?`,
+      )
+    ) {
+      setNewName("");
+      setNewNumber("");
+      console.log("I'm not sure if this gets executed");
+      return;
+    }
+
+    personService
+      .update(person.id, { ...person, number: newNumber })
+      .then((returnedPerson) => {
+        setPersons(
+          persons.map((p) => (p.id === returnedPerson.id ? returnedPerson : p)),
+        );
+        setNewName("");
+        setNewNumber("");
+      });
   };
 
   const handleDeletePerson = (person) => {
