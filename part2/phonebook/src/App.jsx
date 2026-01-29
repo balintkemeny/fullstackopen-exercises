@@ -32,9 +32,32 @@ const App = () => {
   const handleClickAddPerson = (event) => {
     event.preventDefault();
 
-    if (persons.findIndex((person) => person.name === newName) !== -1) {
-      alert(`${newName} is already added to the phonebook`);
-      setNewName("");
+    const existingPerson = persons.find((person) => person.name === newName);
+
+    if (existingPerson !== undefined) {
+      if (
+        !window.confirm(
+          `${newName} is already added to the phonebook. Replace the old number with the new one?`,
+        )
+      ) {
+        setNewName("");
+        setNewNumber("");
+        console.log("I'm not sure if this gets executed");
+        return;
+      }
+
+      personService
+        .update(existingPerson.id, { ...existingPerson, number: newNumber })
+        .then((returnedPerson) => {
+          setPersons(
+            persons.map((p) =>
+              p.id === returnedPerson.id ? returnedPerson : p,
+            ),
+          );
+          setNewName("");
+          setNewNumber("");
+        });
+
       return;
     }
 
