@@ -22,12 +22,6 @@ const App = () => {
     return null;
   }
 
-  const matchingCountries = allCountries.filter((country) =>
-    country.name.common
-      .toLowerCase()
-      .includes(countrySearchField.toLowerCase()),
-  );
-
   return (
     <div>
       <p>
@@ -37,7 +31,11 @@ const App = () => {
           onChange={handleCountrySearchFieldChange}
         />
       </p>
-      <ResultList matchingCountries={matchingCountries} />
+      <ResultList
+        allCountries={allCountries}
+        countrySearchField={countrySearchField}
+        setCountrySearchField={setCountrySearchField}
+      />
     </div>
   );
 };
