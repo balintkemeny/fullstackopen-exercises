@@ -33,6 +33,26 @@ app.get("/api/persons", (req, res) => {
 app.post("/api/persons", (req, res) => {
   const body = req.body;
 
+  let requestErrors = [];
+  if (!body.name) {
+    requestErrors = requestErrors.concat('the "name" field must not be empty');
+  }
+
+  if (!body.number) {
+    requestErrors = requestErrors.concat(
+      'the "number" field must not be empty',
+    );
+  }
+
+  if (persons.find((p) => p.name === body.name)) {
+    requestErrors = requestErrors.concat('the "name" field must be unique');
+  }
+
+  if (requestErrors.length > 0) {
+    res.status(400).json({ errors: requestErrors });
+    return;
+  }
+
   const person = {
     id: String(Math.floor(Math.random() * 2e16)),
     name: body.name,
