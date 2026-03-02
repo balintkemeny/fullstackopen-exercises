@@ -78,16 +78,16 @@ app.post("/api/persons", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = req.params.id;
-  const person = persons.find((p) => p.id === id);
-
-  if (!person) {
-    res.status(404).end();
-    return;
-  }
-
-  res.json(person);
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (person) {
+        res.json(person);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
