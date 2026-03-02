@@ -58,24 +58,24 @@ app.post("/api/persons", (req, res) => {
     );
   }
 
-  if (persons.find((p) => p.name === body.name)) {
-    requestErrors = requestErrors.concat('the "name" field must be unique');
-  }
+  // TODO: Implement duplicate person name error
+  // if (persons.find((p) => p.name === body.name)) {
+  //   requestErrors = requestErrors.concat('the "name" field must be unique');
+  // }
 
   if (requestErrors.length > 0) {
     res.status(400).json({ errors: requestErrors });
     return;
   }
 
-  const person = {
-    id: String(Math.floor(Math.random() * 2e16)),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  res.json(person);
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
