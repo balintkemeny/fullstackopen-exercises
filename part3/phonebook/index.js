@@ -90,6 +90,25 @@ app.get("/api/persons/:id", (req, res) => {
   res.json(person);
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const { name, number } = req.body;
+
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (!person) {
+        res.status(404).end();
+      }
+
+      person.name = name;
+      person.number = number;
+
+      person.save().then((updatedPerson) => {
+        res.json(updatedPerson);
+      });
+    })
+    .catch((error) => next(error));
+});
+
 app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then((result) => {
