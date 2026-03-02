@@ -90,11 +90,12 @@ app.get("/api/persons/:id", (req, res) => {
   res.json(person);
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = req.params.id;
-  persons = persons.filter((p) => p.id !== id);
-
-  res.status(204).end();
+app.delete("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/info", (req, res) => {
