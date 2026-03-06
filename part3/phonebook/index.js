@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.json());
 
-morgan.token("requestBody", (req, res) => JSON.stringify(req.body));
+morgan.token("requestBody", (req) => JSON.stringify(req.body));
 app.use(
   morgan(
     ":method :url :status :res[content-length] - :response-time ms :requestBody",
@@ -72,7 +72,7 @@ app.put("/api/persons/:id", (req, res, next) => {
 
 app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
-    .then((result) => {
+    .then(() => {
       res.status(204).end();
     })
     .catch((error) => next(error));
