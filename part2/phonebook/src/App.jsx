@@ -50,12 +50,17 @@ const App = () => {
 
   const createPerson = () => {
     const newPerson = { name: newName, number: newNumber };
-    personService.create(newPerson).then((returnedPerson) => {
-      setPersons(persons.concat(returnedPerson));
-      setNewName("");
-      setNewNumber("");
-      showNotification(`Added ${returnedPerson.name}`);
-    });
+    personService
+      .create(newPerson)
+      .then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+        showNotification(`Added ${returnedPerson.name}`);
+      })
+      .catch((error) => {
+        showNotification(error.response.data.error, true);
+      });
   };
 
   const updatePerson = (person) => {

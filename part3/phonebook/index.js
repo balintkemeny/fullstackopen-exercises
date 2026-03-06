@@ -26,22 +26,6 @@ app.get("/api/persons", (req, res, next) => {
 app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
-  let requestErrors = [];
-  if (!body.name) {
-    requestErrors = requestErrors.concat('the "name" field must not be empty');
-  }
-
-  if (!body.number) {
-    requestErrors = requestErrors.concat(
-      'the "number" field must not be empty',
-    );
-  }
-
-  if (requestErrors.length > 0) {
-    res.status(400).json({ errors: requestErrors });
-    return;
-  }
-
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -117,6 +101,8 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError") {
     return res.status(400).send({ error: "invalid id format" });
+  } else if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message });
   }
 
   next(error);
