@@ -18,7 +18,13 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
+    minLength: 8,
     required: true,
+    validate: {
+      validator: (v) => /^\d{2,3}-\d+$/.test(v),
+      message: (props) =>
+        `the formatting of phone number: ${props.value} is invalid`,
+    },
   },
 });
 
