@@ -50,4 +50,46 @@ const mostBlogs = (blogs) => {
   return authors[maxIndex];
 };
 
-module.exports = { dummy, totalLikes, favouriteBlog, mostBlogs };
+const getAuthorsLikeCount = (blogs) => {
+  const authorLikesMap = new Map();
+  for (let blog of blogs) {
+    if (!authorLikesMap.has(blog.author)) {
+      authorLikesMap.set(blog.author, 0);
+    }
+
+    authorLikesMap.set(
+      blog.author,
+      authorLikesMap.get(blog.author) + blog.likes,
+    );
+  }
+
+  const authorsArray = [];
+  authorLikesMap.forEach((val, key) => {
+    authorsArray.push({
+      author: key,
+      likes: val,
+    });
+  });
+
+  return authorsArray;
+};
+
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return null;
+  }
+
+  const authorsArray = getAuthorsLikeCount(blogs);
+  const likesCount = authorsArray.map((elem) => elem.likes);
+  const maxIndex = likesCount.indexOf(Math.max(...likesCount));
+
+  return authorsArray[maxIndex];
+};
+
+module.exports = {
+  dummy,
+  totalLikes,
+  favouriteBlog,
+  mostBlogs,
+  mostLikes,
+};
