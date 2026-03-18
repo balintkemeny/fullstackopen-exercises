@@ -58,6 +58,18 @@ describe("POST /api/blogs", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/);
   });
+
+  test("given request payload without the likes field, likes will be 0 by default", async () => {
+    const payloadWithoutLikes = {
+      title: newBlogTitle,
+      author: "John Doe",
+      url: "www.example.com",
+    };
+
+    const response = await api.post("/api/blogs").send(payloadWithoutLikes);
+
+    assert.strictEqual(response.body.likes, 0);
+  });
 });
 
 after(async () => {
