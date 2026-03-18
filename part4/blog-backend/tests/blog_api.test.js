@@ -34,7 +34,7 @@ describe("POST /api/blogs", () => {
     title: newBlogTitle,
     author: "John Doe",
     url: "www.example.com",
-    likes: 0,
+    likes: 42,
   };
 
   test("returns the new blog in the response", async () => {
@@ -59,7 +59,7 @@ describe("POST /api/blogs", () => {
       .expect("Content-Type", /application\/json/);
   });
 
-  test("given request payload without the likes field, likes will be 0 by default", async () => {
+  test("given request payload without likes, likes will be 0 by default", async () => {
     const payloadWithoutLikes = {
       title: newBlogTitle,
       author: "John Doe",
@@ -69,6 +69,26 @@ describe("POST /api/blogs", () => {
     const response = await api.post("/api/blogs").send(payloadWithoutLikes);
 
     assert.strictEqual(response.body.likes, 0);
+  });
+
+  test("given request payload without title, it responds with status 400", async () => {
+    const payloadWithoutTitle = {
+      author: "John Doe",
+      url: "www.example.com",
+      likes: 42,
+    };
+
+    await api.post("/api/blogs").send(payloadWithoutTitle).expect(400);
+  });
+
+  test("given request payload without url, it responds with status 400", async () => {
+    const payloadWithoutUrl = {
+      title: newBlogTitle,
+      author: "John Doe",
+      likes: 42,
+    };
+
+    await api.post("/api/blogs").send(payloadWithoutUrl).expect(400);
   });
 });
 
