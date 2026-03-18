@@ -1,4 +1,8 @@
-const MONGO_CONN_STRING = process.env.MONGO_CONN_STRING;
+const ENVIRONMENT = process.env.NODE_ENV;
+const MONGO_CONN_STRING =
+  ENVIRONMENT === "test"
+    ? process.env.TEST_MONGODB_URI
+    : process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3001;
 
-module.exports = { MONGO_CONN_STRING, PORT };
+module.exports = { ENVIRONMENT, MONGO_CONN_STRING, PORT };
