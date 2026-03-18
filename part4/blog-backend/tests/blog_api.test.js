@@ -28,6 +28,38 @@ describe("GET /api/blogs", () => {
   });
 });
 
+describe("POST /api/blogs", () => {
+  const newBlogTitle = "Lorem Ipsum";
+  const newBlogPayload = {
+    title: newBlogTitle,
+    author: "John Doe",
+    url: "www.example.com",
+    likes: 0,
+  };
+
+  test("returns the new blog in the response", async () => {
+    const response = await api.post("/api/blogs").send(newBlogPayload);
+    const blogFromDb = await Blog.findOne({ title: newBlogTitle });
+
+    assert.deepStrictEqual(response.body, blogFromDb.toJSON());
+  });
+
+  test("persists the new blog in the database", async () => {
+    await api.post("/api/blogs").send(newBlogPayload);
+
+    const response = await api.get("/api/blogs");
+    assert.strictEqual(response.body.length, helper.multipleBlogs.length + 1);
+  });
+
+  test("returns with status 201 and application/json as Content-Type", async () => {
+    await api
+      .post("/api/blogs")
+      .send(newBlogPayload)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
