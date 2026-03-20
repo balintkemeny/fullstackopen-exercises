@@ -105,6 +105,17 @@ describe("DELETE /api/blogs/:id", () => {
     assert(!remainingIds.includes(idToDelete));
     assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length - 1);
   });
+
+  test("given a non-existent id it responds with 204, does not delete further blogs", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const idToDelete = await helper.nonExistentId();
+
+    await api.delete(`/api/blogs/${idToDelete}`).expect(204);
+
+    const blogsAfterDeletion = await helper.blogsInDb();
+
+    assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length);
+  });
 });
 
 describe("PUT /api/blogs/:id", () => {
@@ -127,7 +138,7 @@ describe("PUT /api/blogs/:id", () => {
     assert.deepStrictEqual(response.body, { ...payload, id: blogToUpdate.id });
   });
 
-  test("given a valid id and an incomplete payload it returns 400", async () => {
+  test("given a valid id and an incomplete payload it responds with 400", async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];
 
@@ -144,6 +155,39 @@ describe("PUT /api/blogs/:id", () => {
 
     assert.deepStrictEqual(response.body, {
       error: "Blog validation failed: title: Path `title` is required.",
+    });
+  });
+
+  test("given a non-existent id it responds with 404", async () => {
+    const id = await helper.nonExistentId();
+
+    const payload = {
+      title: "title",
+      author: "author",
+      url: "www.example.com",
+      likes: 123,
+    };
+
+    await api.put(`/api/blogs/${id}`).send(payload).expect(404);
+  });
+
+  test("given a malformed id it responds with 400", async () => {
+    const id = "abcdzzz1";
+
+    const payload = {
+      title: "title",
+      author: "author",
+      url: "www.example.com",
+      likes: 123,
+    };
+
+    const response = await api
+      .put(`/api/blogs/${id}`)
+      .send(payload)
+      .expect(400);
+
+    assert.deepStrictEqual(response.body, {
+      error: "malformed id",
     });
   });
 });
