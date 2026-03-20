@@ -92,6 +92,62 @@ describe("POST /api/blogs", () => {
   });
 });
 
+describe("DELETE /api/blogs/:id", () => {
+  test("given a valid blog id it deletes it from the database and responds with 204", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const idToDelete = blogsAtStart[0].id;
+
+    await api.delete(`/api/blogs/${idToDelete}`).expect(204);
+
+    const blogsAfterDeletion = await helper.blogsInDb();
+    const remainingIds = blogsAfterDeletion.map((blog) => blog.id);
+
+    assert(!remainingIds.includes(idToDelete));
+    assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length - 1);
+  });
+});
+
+describe("PUT /api/blogs/:id", () => {
+  test("given a valid id and valid request payload it updates the blog", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+
+    const payload = {
+      title: blogToUpdate.title,
+      author: blogToUpdate.author,
+      url: blogToUpdate.url,
+      likes: 123,
+    };
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(payload)
+      .expect(200);
+
+    assert.deepStrictEqual(response.body, { ...payload, id: blogToUpdate.id });
+  });
+
+  test("given a valid id and an incomplete payload it returns 400", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+
+    const payload = {
+      author: blogToUpdate.author,
+      url: blogToUpdate.url,
+      likes: 123,
+    };
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(payload)
+      .expect(400);
+
+    assert.deepStrictEqual(response.body, {
+      error: "Blog validation failed: title: Path `title` is required.",
+    });
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
