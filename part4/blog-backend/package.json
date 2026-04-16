@@ -9,7 +9,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development node --watch --env-file='.env.local' index.js",
-    "test": "cross-env NODE_ENV=test node --env-file='.env.local' --test"
+    "test": "cross-env NODE_ENV=test node --env-file='.env.local' --test-concurrency=1 --test"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
