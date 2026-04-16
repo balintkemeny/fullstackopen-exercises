@@ -3,6 +3,7 @@ const assert = require("node:assert");
 const supertest = require("supertest");
 const mongoose = require("mongoose");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const app = require("../app");
 const helper = require("./test_helper");
 
@@ -193,6 +194,28 @@ describe("/api/blogs", () => {
       assert.deepStrictEqual(response.body, {
         error: "malformed id",
       });
+    });
+  });
+});
+
+describe("/api/users", () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+    await User.insertMany(helper.multipleUsers);
+  });
+
+  describe("GET /", () => {
+    test("returns users in JSON format", async () => {
+      await api
+        .get("/api/users")
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+    });
+
+    test("returns the correct amount of users", async () => {
+      const response = await api.get("/api/users");
+
+      assert.strictEqual(response.body.length, helper.multipleUsers.length);
     });
   });
 });

@@ -69,8 +69,30 @@ const blogsInDb = async () => {
   return blogs.map((blog) => blog.toJSON());
 };
 
+const multipleUsers = [
+  {
+    _id: "69e0b0261d01f5a2fbf92cf1",
+    username: "jdoe",
+    name: "John Doe",
+    passwordHash:
+      "$2b$10$CrcUF6myfbgc8xQV05Twauqty0EDbQyv5W09iYS4ypTluNyPbEWJa",
+    blogs: [],
+    __v: 0,
+  },
+  {
+    _id: "69e0cc8c2f0381ded3386201",
+    username: "jndoe",
+    name: "Jane Doe",
+    passwordHash:
+      "$2b$10$dtvefj59cmx3bn8KdvNzruXCbw2HCNKZmyjL87sVvU8HasoexBDgu",
+    blogs: [],
+    __v: 0,
+  },
+];
+
 module.exports = {
   multipleBlogs,
   nonExistentId,
   blogsInDb,
+  multipleUsers,
 };
