@@ -217,6 +217,118 @@ describe("/api/users", () => {
 
       assert.strictEqual(response.body.length, helper.multipleUsers.length);
     });
+
+    test("does not return password hashes", async () => {
+      const response = await api.get("/api/users");
+
+      response.body.forEach((user) => {
+        assert.strictEqual(user.passwordHash, undefined);
+      });
+    });
+  });
+
+  describe("POST /", () => {
+    const newUser = {
+      username: "testuser",
+      name: "Test User",
+      password: "p455w0rd",
+    };
+
+    test("on succesfully creating a user it responds with 201 and sends back JSON", async () => {
+      await api
+        .post("/api/users")
+        .send(newUser)
+        .expect(201)
+        .expect("Content-Type", /application\/json/);
+    });
+
+    test("returns the newly created user in the response", async () => {
+      const response = await api.post("/api/users").send(newUser);
+
+      assert.strictEqual(response.body.username, newUser.username);
+      assert.strictEqual(response.body.name, newUser.name);
+      assert.strictEqual(response.body.passwordHash, undefined);
+      assert.deepStrictEqual(response.body.blogs, []);
+    });
+
+    test("persists the new user in the database", async () => {
+      await api.post("/api/users").send(newUser);
+
+      const usersAfterPost = await helper.usersInDb();
+
+      assert.strictEqual(
+        usersAfterPost.length,
+        helper.multipleUsers.length + 1,
+      );
+    });
+
+    test("returns 400 if username is missing", async () => {
+      const newUserWithoutUsername = {
+        name: "Test User",
+        password: "p455w0rd",
+      };
+
+      const response = await api
+        .post("/api/users")
+        .send(newUserWithoutUsername)
+        .expect(400);
+
+      assert.deepStrictEqual(response.body, {
+        error: "User validation failed: username: Path `username` is required.",
+      });
+    });
+
+    test("returns 400 if username is already taken", async () => {
+      const alreadyExistingUser = {
+        username: "jdoe",
+        name: "John Doe",
+        password: "p455w0rd",
+      };
+
+      const response = await api
+        .post("/api/users")
+        .send(alreadyExistingUser)
+        .expect(400);
+
+      assert.deepStrictEqual(response.body, {
+        error: "the field `username` must be unique",
+      });
+    });
+
+    test("returns 400 if username is shorter than 3 characters", async () => {
+      const userWithShortUsername = {
+        username: "ts",
+        name: "Test User",
+        password: "p455w0rd",
+      };
+
+      const response = await api
+        .post("/api/users")
+        .send(userWithShortUsername)
+        .expect(400);
+
+      assert.deepStrictEqual(response.body, {
+        error:
+          "User validation failed: username: Path `username` (`ts`, length 2) is shorter than the minimum allowed length (3).",
+      });
+    });
+
+    test("returns 400 if password is shorter than 3 characters", async () => {
+      const userWithShortPassword = {
+        username: "testuser",
+        name: "Test User",
+        password: "pw",
+      };
+
+      const response = await api
+        .post("/api/users")
+        .send(userWithShortPassword)
+        .expect(400);
+
+      assert.deepStrictEqual(response.body, {
+        error: "password must be at least 3 characters long",
+      });
+    });
   });
 });
 
