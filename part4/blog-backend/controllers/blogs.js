@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
@@ -12,16 +13,23 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", async (request, response) => {
-  const { title, author, url, likes } = request.body;
+  const body = request.body;
 
-  //TODO: Remove temporary random user assign
-  const user = await User.findOne({});
+  const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+  if (!decodedToken.id) {
+    response.status(401).json({ error: "invalid token" });
+  }
+
+  const user = await User.findById(decodedToken.id);
+  if (!user) {
+    res.status(400).json({ error: "userId is invalid or missing" });
+  }
 
   const blog = new Blog({
-    title,
-    author,
-    url,
-    likes,
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes,
     user: user._id,
   });
 
