@@ -1,4 +1,4 @@
-const { describe, test, after, beforeEach } = require("node:test");
+const { describe, test, before, after, beforeEach } = require("node:test");
 const assert = require("node:assert");
 const supertest = require("supertest");
 const mongoose = require("mongoose");
@@ -10,12 +10,12 @@ const helper = require("./test_helper");
 const api = supertest(app);
 
 describe("/api/blogs", () => {
-  beforeEach(async () => {
-    await Blog.deleteMany({});
-    await Blog.insertMany(helper.multipleBlogs);
-  });
-
   describe("GET /", () => {
+    beforeEach(async () => {
+      await Blog.deleteMany({});
+      await Blog.insertMany(helper.multipleBlogs);
+    });
+
     test("returns blogs in JSON", async () => {
       await api
         .get("/api/blogs")
@@ -39,15 +39,44 @@ describe("/api/blogs", () => {
       likes: 42,
     };
 
+    const testUser = {
+      username: "testuser",
+      name: "Test User",
+      password: "p455w0rd",
+    };
+    let validToken = "";
+
+    before(async () => {
+      await User.deleteMany({});
+      await api.post("/api/users").send(testUser);
+
+      const loginResponse = await api
+        .post("/api/login")
+        .send({ username: testUser.username, password: testUser.password });
+
+      validToken = loginResponse.body.token;
+    });
+
+    beforeEach(async () => {
+      await Blog.deleteMany({});
+      await Blog.insertMany(helper.multipleBlogs);
+    });
+
     test("returns the new blog in the response", async () => {
-      const response = await api.post("/api/blogs").send(newBlogPayload);
+      const response = await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${validToken}`)
+        .send(newBlogPayload);
       const blogFromDb = await Blog.findOne({ title: newBlogTitle });
 
-      assert.deepStrictEqual(response.body, blogFromDb.toJSON());
+      assert.partialDeepStrictEqual(response.body, newBlogPayload);
     });
 
     test("persists the new blog in the database", async () => {
-      await api.post("/api/blogs").send(newBlogPayload);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${validToken}`)
+        .send(newBlogPayload);
 
       const response = await api.get("/api/blogs");
       assert.strictEqual(response.body.length, helper.multipleBlogs.length + 1);
@@ -56,6 +85,7 @@ describe("/api/blogs", () => {
     test("returns with status 201 and application/json as Content-Type", async () => {
       await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${validToken}`)
         .send(newBlogPayload)
         .expect(201)
         .expect("Content-Type", /application\/json/);
@@ -68,7 +98,10 @@ describe("/api/blogs", () => {
         url: "www.example.com",
       };
 
-      const response = await api.post("/api/blogs").send(payloadWithoutLikes);
+      const response = await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${validToken}`)
+        .send(payloadWithoutLikes);
 
       assert.strictEqual(response.body.likes, 0);
     });
@@ -80,7 +113,11 @@ describe("/api/blogs", () => {
         likes: 42,
       };
 
-      await api.post("/api/blogs").send(payloadWithoutTitle).expect(400);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${validToken}`)
+        .send(payloadWithoutTitle)
+        .expect(400);
     });
 
     test("given request payload without url, it responds with status 400", async () => {
@@ -90,16 +127,51 @@ describe("/api/blogs", () => {
         likes: 42,
       };
 
-      await api.post("/api/blogs").send(payloadWithoutUrl).expect(400);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${validToken}`)
+        .send(payloadWithoutUrl)
+        .expect(400);
     });
   });
 
   describe("DELETE /:id", () => {
+    let userId = "";
+    let validToken = "";
+
+    before(async () => {
+      const testUser = {
+        username: "testuser",
+        name: "Test User",
+        password: "p455w0rd",
+      };
+
+      await User.deleteMany({});
+      const userResponse = await api.post("/api/users").send(testUser);
+      userId = userResponse.body.id;
+
+      const loginResponse = await api
+        .post("/api/login")
+        .send({ username: testUser.username, password: testUser.password });
+
+      validToken = loginResponse.body.token;
+    });
+
+    beforeEach(async () => {
+      await Blog.deleteMany({});
+      await Blog.insertMany(
+        helper.multipleBlogs.map((blog) => ({ ...blog, user: userId })),
+      );
+    });
+
     test("given a valid blog id it deletes it from the database and responds with 204", async () => {
       const blogsAtStart = await helper.blogsInDb();
       const idToDelete = blogsAtStart[0].id;
 
-      await api.delete(`/api/blogs/${idToDelete}`).expect(204);
+      await api
+        .delete(`/api/blogs/${idToDelete}`)
+        .set("Authorization", `Bearer ${validToken}`)
+        .expect(204);
 
       const blogsAfterDeletion = await helper.blogsInDb();
       const remainingIds = blogsAfterDeletion.map((blog) => blog.id);
@@ -108,11 +180,14 @@ describe("/api/blogs", () => {
       assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length - 1);
     });
 
-    test("given a non-existent id it responds with 204, does not delete further blogs", async () => {
+    test("given a non-existent id it responds with 404, does not delete further blogs", async () => {
       const blogsAtStart = await helper.blogsInDb();
       const idToDelete = await helper.nonExistentId();
 
-      await api.delete(`/api/blogs/${idToDelete}`).expect(204);
+      await api
+        .delete(`/api/blogs/${idToDelete}`)
+        .set("Authorization", `Bearer ${validToken}`)
+        .expect(404);
 
       const blogsAfterDeletion = await helper.blogsInDb();
 
@@ -121,6 +196,11 @@ describe("/api/blogs", () => {
   });
 
   describe("PUT /:id", () => {
+    beforeEach(async () => {
+      await Blog.deleteMany({});
+      await Blog.insertMany(helper.multipleBlogs);
+    });
+
     test("given a valid id and valid request payload it updates the blog", async () => {
       const blogsAtStart = await helper.blogsInDb();
       const blogToUpdate = blogsAtStart[0];
