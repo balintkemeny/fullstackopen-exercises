@@ -133,6 +133,18 @@ describe("/api/blogs", () => {
         .send(payloadWithoutUrl)
         .expect(400);
     });
+
+    test("given an invalid token, returns with status 401", async () => {
+      await api
+        .post("/api/blogs")
+        .set("Authorization", "Bearer abc.def.ghi")
+        .send(newBlogPayload)
+        .expect(401);
+    });
+
+    test("given a missing token, returns with status 401", async () => {
+      await api.post("/api/blogs").send(newBlogPayload).expect(401);
+    });
   });
 
   describe("DELETE /:id", () => {
@@ -191,6 +203,56 @@ describe("/api/blogs", () => {
 
       const blogsAfterDeletion = await helper.blogsInDb();
 
+      assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length);
+    });
+
+    test("given a missing token it responds with 401 and does not delete any blogs", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const idToDelete = blogsAtStart[0].id;
+
+      await api.delete(`/api/blogs/${idToDelete}`).expect(401);
+
+      const blogsAfterDeletion = await helper.blogsInDb();
+      assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length);
+    });
+
+    test("given an invalid token it responds with 401 and does not delete any blogs", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const idToDelete = blogsAtStart[0].id;
+
+      await api
+        .delete(`/api/blogs/${idToDelete}`)
+        .set("Authorization", "Bearer abc.def.ghi")
+        .expect(401);
+
+      const blogsAfterDeletion = await helper.blogsInDb();
+      assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length);
+    });
+
+    test("given a valid token belonging to another user it responds with 401 and does not delete any blogs", async () => {
+      const otherUser = {
+        username: "otheruser",
+        name: "Other Test User",
+        password: "s3kr3t",
+      };
+
+      await api.post("/api/users").send(otherUser);
+
+      const loginResponse = await api
+        .post("/api/login")
+        .send({ username: otherUser.username, password: otherUser.password });
+
+      otherUserToken = loginResponse.body.token;
+
+      const blogsAtStart = await helper.blogsInDb();
+      const idToDelete = blogsAtStart[0].id;
+
+      await api
+        .delete(`/api/blogs/${idToDelete}`)
+        .set("Authorization", `Bearer ${otherUserToken}`)
+        .expect(401);
+
+      const blogsAfterDeletion = await helper.blogsInDb();
       assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length);
     });
   });
