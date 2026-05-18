@@ -17,6 +17,13 @@ const App = () => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
 
+  useEffect(() => {
+    if (user?.token) {
+      console.log(`Setting token for ${user.username}: ${user.token}`);
+      blogService.setToken(user.token);
+    }
+  }, [user]);
+
   const handleLogin = async (event) => {
     event.preventDefault();
     console.log("logging in with:", username, password);
