@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BlogDetails from "./BlogDetails";
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateBlog }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const detailsButtonLabel = showDetails ? "hide" : "show";
@@ -22,7 +22,7 @@ const Blog = ({ blog }) => {
     <div style={blogStyle}>
       {blog.title} {blog.author}{" "}
       <button onClick={toggleShowDetails}>{detailsButtonLabel}</button>
-      {showDetails && <BlogDetails blog={blog} />}
+      {showDetails && <BlogDetails blog={blog} updateBlog={updateBlog} />}
     </div>
   );
 };

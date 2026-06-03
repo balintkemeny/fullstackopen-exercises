@@ -1,6 +1,9 @@
-const BlogDetails = ({ blog }) => {
+const BlogDetails = ({ blog, updateBlog }) => {
   const handleClickLike = () => {
-    console.log("like clicked...");
+    updateBlog({
+      ...blog,
+      likes: blog.likes + 1,
+    });
   };
 
   return (
