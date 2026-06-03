@@ -63,22 +63,11 @@ const App = () => {
     setUser(null);
   };
 
-  const addBlog = async (event) => {
-    event.preventDefault();
-
+  const createBlog = async (newBlog) => {
     blogFormRef.current.toggleVisibility();
-
-    const newBlog = {
-      title,
-      author,
-      url,
-    };
-
     const createdBlog = await blogService.create(newBlog);
     setBlogs(blogs.concat(createdBlog));
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+
     showNotification(
       `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
       false,
@@ -107,15 +96,7 @@ const App = () => {
             <button onClick={handleLogout}>logout</button>
           </p>
           <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
-            <BlogForm
-              addBlog={addBlog}
-              title={title}
-              setTitle={setTitle}
-              author={author}
-              setAuthor={setAuthor}
-              url={url}
-              setUrl={setUrl}
-            />
+            <BlogForm createBlog={createBlog} />
           </Toggleable>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
