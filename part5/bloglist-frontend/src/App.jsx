@@ -76,6 +76,11 @@ const App = () => {
     setBlogs(blogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b)));
   };
 
+  const deleteBlog = async (blogId) => {
+    await blogService.deleteById(blogId);
+    setBlogs(blogs.filter((b) => b.id !== blogId));
+  };
+
   const blogsOrdered = blogs.toSorted((a, b) => b.likes - a.likes);
 
   return (
@@ -103,7 +108,13 @@ const App = () => {
             <BlogForm createBlog={createBlog} />
           </Toggleable>
           {blogsOrdered.map((blog) => (
-            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+              deleteBlog={deleteBlog}
+              currentUsername={user.username}
+            />
           ))}
         </>
       )}
