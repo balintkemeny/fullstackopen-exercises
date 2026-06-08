@@ -76,6 +76,8 @@ const App = () => {
     setBlogs(blogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b)));
   };
 
+  const blogsOrdered = blogs.toSorted((a, b) => b.likes - a.likes);
+
   return (
     <div>
       {user ? <h2>blogs</h2> : <h2>log in to application</h2>}
@@ -100,7 +102,7 @@ const App = () => {
           <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
             <BlogForm createBlog={createBlog} />
           </Toggleable>
-          {blogs.map((blog) => (
+          {blogsOrdered.map((blog) => (
             <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
           ))}
         </>
