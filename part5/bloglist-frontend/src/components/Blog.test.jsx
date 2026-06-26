@@ -73,3 +73,19 @@ test("clicking the hide button hides the URL and the number of likes as well", a
   const likesDiv = screen.queryByText(`likes: ${testBlogFull.likes}`);
   expect(likesDiv).toBeNull();
 });
+
+test("clicking the like button twice calls the event handler twice", async () => {
+  const mockUpdateBlog = vi.fn();
+
+  render(<Blog blog={testBlogFull} updateBlog={mockUpdateBlog} />);
+  const user = userEvent.setup();
+
+  const showButton = screen.getByText("show");
+  await user.click(showButton);
+
+  const likeButton = screen.getByText("like");
+  await user.click(likeButton);
+  await user.click(likeButton);
+
+  expect(mockUpdateBlog.mock.calls).toHaveLength(2);
+});
