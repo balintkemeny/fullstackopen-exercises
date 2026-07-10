@@ -79,6 +79,17 @@ describe("Bloglist app", () => {
 
         await expect(blogDiv.getByText("likes: 1")).toBeVisible();
       });
+
+      test("the blog can be deleted", async ({ page }) => {
+        page.on("dialog", (dialog) => dialog.accept());
+
+        const blogDiv = page.getByText("Test Title Test Author");
+        await blogDiv.getByRole("button", { name: "remove" }).click();
+
+        await expect(
+          page.getByText("Test Title Test Author"),
+        ).not.toBeVisible();
+      });
     });
   });
 });
