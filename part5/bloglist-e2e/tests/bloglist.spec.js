@@ -91,6 +91,62 @@ describe("Bloglist app", () => {
         ).not.toBeVisible();
       });
     });
+
+    describe("and multiple blogs have been created with differing number of likes", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, {
+          title: "First Title",
+          author: "First Author",
+          url: "www.first.blog",
+        });
+        await createBlog(page, {
+          title: "Second Title",
+          author: "Second Author",
+          url: "www.second.blog",
+        });
+        await createBlog(page, {
+          title: "Third Title",
+          author: "Third Author",
+          url: "www.third.blog",
+        });
+
+        const firstBlogDiv = page.getByText("First Title First Author");
+        await firstBlogDiv.getByRole("button", { name: "show" }).click();
+        await firstBlogDiv.getByRole("button", { name: "like" }).click();
+
+        const secondBlogDiv = page.getByText("Second Title Second Author");
+        await secondBlogDiv.getByRole("button", { name: "show" }).click();
+
+        const thirdBlogDiv = page.getByText("Third Title Third Author");
+        await thirdBlogDiv.getByRole("button", { name: "show" }).click();
+        await thirdBlogDiv.getByRole("button", { name: "like" }).click();
+        await thirdBlogDiv.getByRole("button", { name: "like" }).click();
+      });
+
+      test("the correct amount of likes are displayed", async ({ page }) => {
+        await expect(
+          page.getByText("First Title First Author").getByText("likes: 1"),
+        ).toBeVisible();
+
+        await expect(
+          page.getByText("Second Title Second Author").getByText("likes: 0"),
+        ).toBeVisible();
+
+        await expect(
+          page.getByText("Third Title Third Author").getByText("likes: 2"),
+        ).toBeVisible();
+      });
+
+      test("blogs are rendered by likes in descending order", async ({
+        page,
+      }) => {
+        const blogDivs = await page.locator(".blog").all();
+
+        await expect(blogDivs[0]).toContainText("Third Title Third Author");
+        await expect(blogDivs[1]).toContainText("First Title First Author");
+        await expect(blogDivs[2]).toContainText("Second Title Second Author");
+      });
+    });
   });
 
   describe("when there is a blog created by another user", () => {
