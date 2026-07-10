@@ -1,5 +1,5 @@
 import { beforeEach, test, describe, expect } from "@playwright/test";
-import { loginWith, createBlog } from "./helper";
+import { loginWith, logout, createBlog } from "./helper";
 
 describe("Bloglist app", () => {
   const user = {
@@ -90,6 +90,38 @@ describe("Bloglist app", () => {
           page.getByText("Test Title Test Author"),
         ).not.toBeVisible();
       });
+    });
+  });
+
+  describe("when there is a blog created by another user", () => {
+    const secondUser = {
+      name: "Second User",
+      username: "second_user",
+      password: "second_pwd",
+    };
+
+    beforeEach(async ({ page, request }) => {
+      await request.post("/api/users", {
+        data: secondUser,
+      });
+
+      await loginWith(page, secondUser.username, secondUser.password);
+      await createBlog(page, {
+        title: "Test Title",
+        author: "Test Author",
+        url: "www.test.com",
+      });
+
+      await logout(page);
+
+      await loginWith(page, user.username, user.password);
+    });
+
+    test("the blog cannot be deleted", async ({ page }) => {
+      const blogDiv = page.getByText("Test Title Test Author");
+      await expect(
+        blogDiv.getByRole("button", { name: "remove" }),
+      ).not.toBeVisible();
     });
   });
 });
