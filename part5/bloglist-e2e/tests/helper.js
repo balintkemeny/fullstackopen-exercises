@@ -11,6 +11,6 @@ const createBlog = async (page, blog) => {
   await page.getByLabel("url:").fill(blog.url);
   await page.getByRole("button", { name: "create" }).click();
   await page.getByText(`${blog.title} ${blog.author}`).waitFor();
-}
+};
 
 export { loginWith, createBlog };

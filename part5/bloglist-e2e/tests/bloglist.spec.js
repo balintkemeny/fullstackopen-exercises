@@ -1,5 +1,5 @@
-const { beforeEach, test, describe, expect } = require("@playwright/test");
-const { loginWith, createBlog } = require("./helper");
+import { beforeEach, test, describe, expect } from "@playwright/test";
+import { loginWith, createBlog } from "./helper";
 
 describe("Bloglist app", () => {
   const user = {
@@ -54,11 +54,31 @@ describe("Bloglist app", () => {
       });
 
       const notificationDiv = page.locator(".notification");
-      await expect(notificationDiv).toContainText("a new blog Test Title by Test Author added");
+      await expect(notificationDiv).toContainText(
+        "a new blog Test Title by Test Author added",
+      );
       await expect(notificationDiv).toHaveCSS("border-style", "solid");
       await expect(notificationDiv).toHaveCSS("color", "rgb(0, 128, 0)");
 
       await expect(page.getByText("Test Title Test Author")).toBeVisible();
+    });
+
+    describe("and a blog has been created", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, {
+          title: "Test Title",
+          author: "Test Author",
+          url: "www.test.com",
+        });
+      });
+
+      test("the blog can be liked", async ({ page }) => {
+        const blogDiv = page.getByText("Test Title Test Author");
+        await blogDiv.getByRole("button", { name: "show" }).click();
+        await blogDiv.getByRole("button", { name: "like" }).click();
+
+        await expect(blogDiv.getByText("likes: 1")).toBeVisible();
+      });
     });
   });
 });
