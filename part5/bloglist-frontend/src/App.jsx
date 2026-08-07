@@ -94,9 +94,16 @@ const App = () => {
         <Link style={padding} to={"/"}>
           blogs
         </Link>
-        <Link style={padding} to={"/login"}>
-          login
-        </Link>
+        {!user && (
+          <Link style={padding} to={"/login"}>
+            login
+          </Link>
+        )}
+        {user && (
+          <button onClick={handleLogout} style={padding}>
+            logout
+          </button>
+        )}
       </div>
 
       <Notification notification={notification} />
