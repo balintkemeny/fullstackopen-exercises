@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { Link, Routes, Route } from "react-router-dom";
+
 import Blog from "./components/Blog";
+import Blogs from "./components/Blogs";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
@@ -81,43 +84,48 @@ const App = () => {
     setBlogs(blogs.filter((b) => b.id !== blogId));
   };
 
-  const blogsOrdered = blogs.toSorted((a, b) => b.likes - a.likes);
+  const padding = {
+    padding: 5,
+  };
 
   return (
     <div>
-      {user ? <h2>blogs</h2> : <h2>log in to application</h2>}
+      <div>
+        <Link style={padding} to={"/"}>
+          blogs
+        </Link>
+        <Link style={padding} to={"/login"}>
+          login
+        </Link>
+      </div>
+
       <Notification notification={notification} />
-      {!user && (
-        <>
-          <LoginForm
-            handleLogin={handleLogin}
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
-          />
-        </>
-      )}
-      {user && (
-        <>
-          <p>
-            {user.name} logged in
-            <button onClick={handleLogout}>logout</button>
-          </p>
-          <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
-            <BlogForm createBlog={createBlog} />
-          </Toggleable>
-          {blogsOrdered.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Blogs
+              blogs={blogs}
               updateBlog={updateBlog}
               deleteBlog={deleteBlog}
-              currentUsername={user.username}
+              user={user}
             />
-          ))}
-        </>
-      )}
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <LoginForm
+              handleLogin={handleLogin}
+              username={username}
+              setUsername={setUsername}
+              password={password}
+              setPassword={setPassword}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
 };
