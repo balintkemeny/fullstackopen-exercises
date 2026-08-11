@@ -1,9 +1,15 @@
-const BlogDetails = ({ blog, updateBlog }) => {
+const BlogDetails = ({ blog, updateBlog, deleteBlog, currentUsername }) => {
   const handleClickLike = () => {
     updateBlog({
       ...blog,
       likes: blog.likes + 1,
     });
+  };
+
+  const handleClickRemove = () => {
+    if (window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`)) {
+      deleteBlog(blog.id);
+    }
   };
 
   return (
@@ -12,7 +18,10 @@ const BlogDetails = ({ blog, updateBlog }) => {
       <div>
         likes: {blog.likes} <button onClick={handleClickLike}>like</button>
       </div>
-      <div>{blog.user.name}</div>
+      <div>Added by {blog.user.name}</div>
+      {blog.user.username === currentUsername && (
+        <button onClick={handleClickRemove}>remove</button>
+      )}
     </div>
   );
 };

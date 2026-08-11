@@ -28,8 +28,15 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUsername }) => {
     <div className="blog" style={blogStyle}>
       {blog.title} {blog.author}{" "}
       <button onClick={toggleShowDetails}>{detailsButtonLabel}</button>
-      {showDetails && <BlogDetails blog={blog} updateBlog={updateBlog} />}
-      {blog.user.username === currentUsername && (
+      {showDetails && (
+        <BlogDetails
+          blog={blog}
+          updateBlog={updateBlog}
+          deleteBlog={deleteBlog}
+          currentUsername={currentUsername}
+        />
+      )}
+      {!showDetails && blog.user.username === currentUsername && (
         <button onClick={handleClickRemove}>remove</button>
       )}
     </div>

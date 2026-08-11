@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { useMatch, Link, Routes, Route } from "react-router-dom";
 
 import Blog from "./components/Blog";
 import Blogs from "./components/Blogs";
@@ -88,6 +88,11 @@ const App = () => {
     padding: 5,
   };
 
+  const blogIdMatch = useMatch("/blogs/:id");
+  const currentBlog = blogIdMatch
+    ? blogs.find((b) => b.id === blogIdMatch.params.id)
+    : null;
+
   return (
     <div>
       <div>
@@ -109,6 +114,17 @@ const App = () => {
       <Notification notification={notification} />
 
       <Routes>
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blog={currentBlog}
+              updateBlog={updateBlog}
+              deleteBlog={deleteBlog}
+              currentUsername={user ? user.username : null}
+            />
+          }
+        />
         <Route
           path="/"
           element={
