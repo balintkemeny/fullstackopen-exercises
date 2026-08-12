@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useMatch, Link, Routes, Route } from "react-router-dom";
 
-import Blog from "./components/Blog";
+import BlogDetails from "./components/BlogDetails";
 import Blogs from "./components/Blogs";
-import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
-import Toggleable from "./components/Toggleable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import "./index.css";
@@ -31,7 +29,7 @@ const App = () => {
     }
   }, [user]);
 
-  const blogFormRef = useRef();
+  // const blogFormRef = useRef();
 
   const showNotification = (message, isError = false) => {
     setNotification({ message, isError });
@@ -63,16 +61,16 @@ const App = () => {
     setUser(null);
   };
 
-  const createBlog = async (newBlog) => {
-    blogFormRef.current.toggleVisibility();
-    const createdBlog = await blogService.create(newBlog);
-    setBlogs(blogs.concat(createdBlog));
+  // const createBlog = async (newBlog) => {
+  //   blogFormRef.current.toggleVisibility();
+  //   const createdBlog = await blogService.create(newBlog);
+  //   setBlogs(blogs.concat(createdBlog));
 
-    showNotification(
-      `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-      false,
-    );
-  };
+  //   showNotification(
+  //     `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
+  //     false,
+  //   );
+  // };
 
   const updateBlog = async (blog) => {
     const updatedBlog = await blogService.update(blog);
@@ -117,7 +115,7 @@ const App = () => {
         <Route
           path="/blogs/:id"
           element={
-            <Blog
+            <BlogDetails
               blog={currentBlog}
               updateBlog={updateBlog}
               deleteBlog={deleteBlog}
@@ -125,17 +123,7 @@ const App = () => {
             />
           }
         />
-        <Route
-          path="/"
-          element={
-            <Blogs
-              blogs={blogs}
-              updateBlog={updateBlog}
-              deleteBlog={deleteBlog}
-              user={user}
-            />
-          }
-        />
+        <Route path="/" element={<Blogs blogs={blogs} />} />
         <Route
           path="/login"
           element={
