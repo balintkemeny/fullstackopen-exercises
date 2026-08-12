@@ -8,6 +8,7 @@ import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import "./index.css";
+import BlogForm from "./components/BlogForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -61,16 +62,15 @@ const App = () => {
     setUser(null);
   };
 
-  // const createBlog = async (newBlog) => {
-  //   blogFormRef.current.toggleVisibility();
-  //   const createdBlog = await blogService.create(newBlog);
-  //   setBlogs(blogs.concat(createdBlog));
+  const createBlog = async (newBlog) => {
+    const createdBlog = await blogService.create(newBlog);
+    setBlogs(blogs.concat(createdBlog));
 
-  //   showNotification(
-  //     `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-  //     false,
-  //   );
-  // };
+    showNotification(
+      `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
+      false,
+    );
+  };
 
   const updateBlog = async (blog) => {
     const updatedBlog = await blogService.update(blog);
@@ -97,6 +97,11 @@ const App = () => {
         <Link style={padding} to={"/"}>
           blogs
         </Link>
+        {user && (
+          <Link style={padding} to={"/create"}>
+            new blog
+          </Link>
+        )}
         {!user && (
           <Link style={padding} to={"/login"}>
             login
@@ -136,6 +141,7 @@ const App = () => {
             />
           }
         />
+        <Route path="/create" element={<BlogForm createBlog={createBlog} />} />
       </Routes>
     </div>
   );
