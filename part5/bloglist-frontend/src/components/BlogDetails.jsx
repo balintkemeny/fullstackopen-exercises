@@ -1,4 +1,8 @@
 const BlogDetails = ({ blog, updateBlog, deleteBlog, currentUsername }) => {
+  if (!blog) {
+    return null;
+  }
+
   const handleClickLike = () => {
     updateBlog({
       ...blog,
