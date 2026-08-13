@@ -1,5 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import { renderWithRouter } from "../test/utils";
 import BlogDetails from "./BlogDetails";
 
 describe("BlogDetails", () => {
@@ -16,7 +18,7 @@ describe("BlogDetails", () => {
 
   describe("when the user is not logged in", () => {
     beforeEach(() => {
-      render(<BlogDetails blog={testBlogFull} />);
+      renderWithRouter(<BlogDetails blog={testBlogFull} />);
     });
 
     test("renders title", () => {
@@ -57,7 +59,7 @@ describe("BlogDetails", () => {
     const mockUpdateBlog = vi.fn();
 
     beforeEach(() => {
-      render(
+      renderWithRouter(
         <BlogDetails
           blog={testBlogFull}
           currentUsername={secondUsername}
@@ -103,7 +105,7 @@ describe("BlogDetails", () => {
   describe("when the owner of the blog is logged in", () => {
     const mockDeleteBlog = vi.fn();
     beforeEach(() => {
-      render(
+      renderWithRouter(
         <BlogDetails
           blog={testBlogFull}
           currentUsername={testBlogFull.user.username}

@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 const BlogDetails = ({ blog, updateBlog, deleteBlog, currentUsername }) => {
+  const navigate = useNavigate();
+
   if (!blog) {
     return null;
   }
@@ -13,6 +17,7 @@ const BlogDetails = ({ blog, updateBlog, deleteBlog, currentUsername }) => {
   const handleClickRemove = () => {
     if (window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`)) {
       deleteBlog(blog.id);
+      navigate("/");
     }
   };
 
