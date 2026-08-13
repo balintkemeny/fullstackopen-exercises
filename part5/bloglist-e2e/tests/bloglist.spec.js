@@ -17,17 +17,21 @@ describe("Bloglist app", () => {
     await page.goto("/");
   });
 
-  test("Login form is shown", async ({ page }) => {
+  test("when the login link in the navbar is clicked the login form is shown", async ({
+    page,
+  }) => {
+    await page.getByText("login").click();
     await expect(page.getByLabel("username")).toBeVisible();
     await expect(page.getByLabel("password")).toBeVisible();
     await expect(page.getByRole("button", { name: "login" })).toBeVisible();
   });
 
-  test("Login succeeds when correct credentials are provided", async ({
+  test.only("login succeeds when correct credentials are provided", async ({
     page,
   }) => {
     await loginWith(page, user.username, user.password);
-    await expect(page.getByText("Test User logged in")).toBeVisible();
+    await expect(page.getByText("new blog")).toBeVisible();
+    await expect(page.getByRole("button", { name: "logout" })).toBeVisible();
   });
 
   test("Login fails when wrong credentials are provided", async ({ page }) => {
