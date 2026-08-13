@@ -54,18 +54,9 @@ describe("BlogDetails", () => {
 
   describe("when a user that is not the owner of the blog is logged in", () => {
     const secondUsername = "otheruser";
+    const mockUpdateBlog = vi.fn();
 
-    test("renders like button", () => {
-      render(
-        <BlogDetails blog={testBlogFull} currentUsername={secondUsername} />,
-      );
-
-      const likeButton = screen.getByText("like");
-      expect(likeButton).toBeDefined();
-    });
-
-    test("clicking the like button twice calls the event handler twice", async () => {
-      const mockUpdateBlog = vi.fn();
+    beforeEach(() => {
       render(
         <BlogDetails
           blog={testBlogFull}
@@ -73,6 +64,27 @@ describe("BlogDetails", () => {
           updateBlog={mockUpdateBlog}
         />,
       );
+    });
+
+    afterEach(() => {
+      mockUpdateBlog.mockClear();
+    });
+
+    test("renders like button", () => {
+      const likeButton = screen.getByText("like");
+      expect(likeButton).toBeDefined();
+    });
+
+    test("clicking the like button once calls the event handler once", async () => {
+      const user = userEvent.setup();
+
+      const likeButton = screen.getByText("like");
+      await user.click(likeButton);
+
+      expect(mockUpdateBlog.mock.calls).toHaveLength(1);
+    });
+
+    test("clicking the like button twice calls the event handler twice", async () => {
       const user = userEvent.setup();
 
       const likeButton = screen.getByText("like");
@@ -83,14 +95,45 @@ describe("BlogDetails", () => {
     });
 
     test("does not render remove button", () => {
-      render(
-        <BlogDetails blog={testBlogFull} currentUsername={secondUsername} />,
-      );
-
       const removeButton = screen.queryByText("remove");
       expect(removeButton).toBeNull();
     });
   });
 
-  describe("when the owner of the blog is logged in", () => {});
+  describe("when the owner of the blog is logged in", () => {
+    const mockDeleteBlog = vi.fn();
+    beforeEach(() => {
+      render(
+        <BlogDetails
+          blog={testBlogFull}
+          currentUsername={testBlogFull.user.username}
+          deleteBlog={mockDeleteBlog}
+        />,
+      );
+    });
+
+    afterEach(() => {
+      mockDeleteBlog.mockClear();
+    });
+
+    test("renders the remove button", () => {
+      const removeButton = screen.getByText("remove");
+      expect(removeButton).toBeDefined();
+    });
+
+    test("clicking the remove button calls deleteBlog", async () => {
+      const spyWindowConfirm = vi
+        .spyOn(window, "confirm")
+        .mockReturnValueOnce(true);
+      const user = userEvent.setup();
+
+      const removeButton = screen.getByText("remove");
+      await user.click(removeButton);
+
+      expect(spyWindowConfirm.mock.calls).toHaveLength(1);
+      expect(mockDeleteBlog.mock.calls).toHaveLength(1);
+
+      spyWindowConfirm.mockRestore();
+    });
+  });
 });
