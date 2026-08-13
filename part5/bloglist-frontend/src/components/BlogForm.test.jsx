@@ -1,5 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import { renderWithRouter } from "../test/utils";
 import BlogForm from "./BlogForm";
 
 const testBlog = {
@@ -10,7 +12,7 @@ const testBlog = {
 
 test("blog form calls event handler with correct arguments on submit", async () => {
   const mockCreateBlog = vi.fn();
-  render(<BlogForm createBlog={mockCreateBlog} />);
+  renderWithRouter(<BlogForm createBlog={mockCreateBlog} />);
   const user = userEvent.setup();
 
   const titleInput = screen.getByLabelText("title:");
