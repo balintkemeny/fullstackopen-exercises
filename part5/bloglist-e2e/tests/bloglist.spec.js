@@ -26,7 +26,7 @@ describe("Bloglist app", () => {
     await expect(page.getByRole("button", { name: "login" })).toBeVisible();
   });
 
-  test.only("login succeeds when correct credentials are provided", async ({
+  test("login succeeds when correct credentials are provided", async ({
     page,
   }) => {
     await loginWith(page, user.username, user.password);
@@ -42,7 +42,10 @@ describe("Bloglist app", () => {
     await expect(errorDiv).toHaveCSS("border-style", "solid");
     await expect(errorDiv).toHaveCSS("color", "rgb(255, 0, 0)");
 
-    await expect(page.getByText("Test User logged in")).not.toBeVisible();
+    await expect(page.getByText("new blog")).not.toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "logout" }),
+    ).not.toBeVisible();
   });
 
   describe("When a user is logged in", () => {
@@ -50,7 +53,7 @@ describe("Bloglist app", () => {
       await loginWith(page, user.username, user.password);
     });
 
-    test("a new blog can be created", async ({ page }) => {
+    test.only("a new blog can be created", async ({ page }) => {
       await createBlog(page, {
         title: "Test Title",
         author: "Test Author",
@@ -64,7 +67,9 @@ describe("Bloglist app", () => {
       await expect(notificationDiv).toHaveCSS("border-style", "solid");
       await expect(notificationDiv).toHaveCSS("color", "rgb(0, 128, 0)");
 
-      await expect(page.getByText("Test Title Test Author")).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Test Title by Test Author" }),
+      ).toBeVisible();
     });
 
     describe("and a blog has been created", () => {
