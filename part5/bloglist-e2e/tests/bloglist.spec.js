@@ -37,10 +37,10 @@ describe("Bloglist app", () => {
   test("Login fails when wrong credentials are provided", async ({ page }) => {
     await loginWith(page, user.username, "wrong_pwd");
 
-    const errorDiv = page.locator(".error");
-    await expect(errorDiv).toContainText("wrong username or password");
-    await expect(errorDiv).toHaveCSS("border-style", "solid");
-    await expect(errorDiv).toHaveCSS("color", "rgb(255, 0, 0)");
+    const notificationMessaage = page.locator(".MuiAlert-message");
+    await expect(notificationMessaage).toContainText(
+      "wrong username or password",
+    );
 
     await expect(page.getByText("new blog")).not.toBeVisible();
     await expect(
@@ -60,12 +60,10 @@ describe("Bloglist app", () => {
         url: "www.test.com",
       });
 
-      const notificationDiv = page.locator(".notification");
-      await expect(notificationDiv).toContainText(
+      const notificationMessage = page.locator(".MuiAlert-message");
+      await expect(notificationMessage).toContainText(
         "a new blog Test Title by Test Author added",
       );
-      await expect(notificationDiv).toHaveCSS("border-style", "solid");
-      await expect(notificationDiv).toHaveCSS("color", "rgb(0, 128, 0)");
 
       await expect(page.getByRole("heading", { name: "blogs" })).toBeVisible();
       await expect(
