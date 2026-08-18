@@ -11,9 +11,9 @@ const logout = async (page) => {
 
 const createBlog = async (page, blog) => {
   await page.getByText("new blog").click();
-  await page.getByLabel("title:").fill(blog.title);
-  await page.getByLabel("author:").fill(blog.author);
-  await page.getByLabel("url:").fill(blog.url);
+  await page.getByLabel("title").fill(blog.title);
+  await page.getByLabel("author").fill(blog.author);
+  await page.getByLabel("url").fill(blog.url);
   await page.getByRole("button", { name: "create" }).click();
   await page
     .getByRole("link", { name: `${blog.title} by ${blog.author}` })

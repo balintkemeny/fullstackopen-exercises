@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMatch, Link, Routes, Route } from "react-router-dom";
+import { Container } from "@mui/material";
 
 import BlogDetails from "./components/BlogDetails";
 import Blogs from "./components/Blogs";
@@ -92,7 +93,7 @@ const App = () => {
     : null;
 
   return (
-    <div>
+    <Container>
       <div>
         <Link style={padding} to={"/"}>
           blogs
@@ -143,7 +144,7 @@ const App = () => {
         />
         <Route path="/create" element={<BlogForm createBlog={createBlog} />} />
       </Routes>
-    </div>
+    </Container>
   );
 };
 

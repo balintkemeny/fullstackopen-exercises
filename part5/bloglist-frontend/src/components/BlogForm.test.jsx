@@ -15,13 +15,13 @@ test("blog form calls event handler with correct arguments on submit", async () 
   renderWithRouter(<BlogForm createBlog={mockCreateBlog} />);
   const user = userEvent.setup();
 
-  const titleInput = screen.getByLabelText("title:");
+  const titleInput = screen.getByLabelText("title");
   await user.type(titleInput, testBlog.title);
 
-  const authorInput = screen.getByLabelText("author:");
+  const authorInput = screen.getByLabelText("author");
   await user.type(authorInput, testBlog.author);
 
-  const urlInput = screen.getByLabelText("url:");
+  const urlInput = screen.getByLabelText("url");
   await user.type(urlInput, testBlog.url);
 
   const submitButton = screen.getByText("create");

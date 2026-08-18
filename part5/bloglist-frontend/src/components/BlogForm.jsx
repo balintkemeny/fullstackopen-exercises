@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TextField, Button } from "@mui/material";
 
 const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState("");
@@ -23,39 +24,42 @@ const BlogForm = ({ createBlog }) => {
   };
 
   return (
-    <form onSubmit={handleAddBlog}>
-      <div>
-        <label>
-          title:
-          <input
-            type="text"
+    <div>
+      <h2>Create a new blog</h2>
+      <form onSubmit={handleAddBlog}>
+        <div>
+          <TextField
+            label="title"
             value={title}
             onChange={({ target }) => setTitle(target.value)}
+            variant="outlined"
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          author:
-          <input
-            type="text"
+        </div>
+        <div>
+          <TextField
+            label="author"
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
+            variant="outlined"
+            style={{ marginTop: 10 }}
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          url:
-          <input
-            type="text"
+        </div>
+        <div>
+          <TextField
+            label="url"
             value={url}
             onChange={({ target }) => setUrl(target.value)}
+            variant="outlined"
+            style={{ marginTop: 10 }}
           />
-        </label>
-      </div>
-      <button type="submit">create</button>
-    </form>
+        </div>
+        <div>
+          <Button type="submit" variant="contained" style={{ marginTop: 15 }}>
+            create
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 
