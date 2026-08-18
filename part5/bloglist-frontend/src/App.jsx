@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { useMatch, Link, Routes, Route } from "react-router-dom";
-import { Container } from "@mui/material";
+import {
+  Container,
+  Box,
+  AppBar,
+  Toolbar,
+  Button,
+  Typography,
+} from "@mui/material";
 
 import BlogDetails from "./components/BlogDetails";
 import Blogs from "./components/Blogs";
@@ -91,28 +98,56 @@ const App = () => {
     ? blogs.find((b) => b.id === blogIdMatch.params.id)
     : null;
 
+  const buttonHoverStyle = { "&:hover": { bgcolor: "rgba(255,255,255,0.3)" } };
+
   return (
     <Container>
-      <div>
-        <Link style={padding} to={"/"}>
-          blogs
-        </Link>
-        {user && (
-          <Link style={padding} to={"/create"}>
-            new blog
-          </Link>
-        )}
-        {!user && (
-          <Link style={padding} to={"/login"}>
-            login
-          </Link>
-        )}
-        {user && (
-          <button onClick={handleLogout} style={padding}>
-            logout
-          </button>
-        )}
-      </div>
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
+              Blog App
+            </Typography>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/"
+              sx={buttonHoverStyle}
+            >
+              blogs
+            </Button>
+            {user && (
+              <Button
+                color="inherit"
+                component={Link}
+                to="/create"
+                sx={buttonHoverStyle}
+              >
+                new blog
+              </Button>
+            )}
+            {!user && (
+              <Button
+                color="inherit"
+                component={Link}
+                to="/login"
+                sx={buttonHoverStyle}
+              >
+                login
+              </Button>
+            )}
+            {user && (
+              <Button
+                onClick={handleLogout}
+                color="inherit"
+                sx={buttonHoverStyle}
+              >
+                logout
+              </Button>
+            )}
+          </Toolbar>
+        </AppBar>
+      </Box>
 
       <Notification notification={notification} />
 
