@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { TextField, Button } from "@mui/material";
 
 const LoginForm = ({
   handleLogin,
@@ -10,34 +11,36 @@ const LoginForm = ({
   const navigate = useNavigate();
 
   return (
-    <form
-      onSubmit={(event) => {
-        handleLogin(event);
-        navigate("/");
-      }}
-    >
-      <div>
-        <label>
-          username
-          <input
-            type="text"
+    <div>
+      <h2>Log in to application</h2>
+      <form
+        onSubmit={(event) => {
+          handleLogin(event);
+          navigate("/");
+        }}
+      >
+        <div>
+          <TextField
+            label="username"
             value={username}
             onChange={({ target }) => setUsername(target.value)}
+            variant="standard"
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          password
-          <input
+        </div>
+        <div>
+          <TextField
             type="password"
+            label="password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
+            variant="standard"
           />
-        </label>
-      </div>
-      <button type="submit">login</button>
-    </form>
+        </div>
+        <Button type="submit" variant="contained" style={{ marginTop: 15 }}>
+          login
+        </Button>
+      </form>
+    </div>
   );
 };
 
