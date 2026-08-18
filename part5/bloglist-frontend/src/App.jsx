@@ -8,7 +8,6 @@ import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
-import "./index.css";
 import BlogForm from "./components/BlogForm";
 
 const App = () => {
